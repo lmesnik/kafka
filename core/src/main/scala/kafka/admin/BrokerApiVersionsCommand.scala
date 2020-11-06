@@ -111,7 +111,7 @@ object BrokerApiVersionsCommand {
     @volatile var running: Boolean = true
     val pendingFutures = new ConcurrentLinkedQueue[RequestFuture[ClientResponse]]()
 
-    val networkThread = new KafkaThread("admin-client-network-thread", () => {
+    val networkThread = KafkaThread.newKafkaThread("admin-client-network-thread", () => {
       try {
         while (running)
           client.poll(time.timer(Long.MaxValue))

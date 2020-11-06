@@ -575,7 +575,7 @@ public class KafkaAdminClient extends AdminClient {
         this.client = client;
         this.runnable = new AdminClientRunnable();
         String threadName = NETWORK_THREAD_PREFIX + " | " + clientId;
-        this.thread = new KafkaThread(threadName, runnable, true);
+        this.thread = KafkaThread.newKafkaThread(threadName, runnable, true);
         this.timeoutProcessorFactory = (timeoutProcessorFactory == null) ?
             new TimeoutProcessorFactory() : timeoutProcessorFactory;
         this.maxRetries = config.getInt(AdminClientConfig.RETRIES_CONFIG);

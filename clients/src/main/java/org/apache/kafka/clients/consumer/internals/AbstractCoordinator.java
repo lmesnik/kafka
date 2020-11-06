@@ -1276,13 +1276,14 @@ public abstract class AbstractCoordinator implements Closeable {
         }
     }
 
-    private class HeartbeatThread extends KafkaThread implements AutoCloseable {
+    private class HeartbeatThread extends Thread implements AutoCloseable {
         private boolean enabled = false;
         private boolean closed = false;
         private final AtomicReference<RuntimeException> failed = new AtomicReference<>(null);
 
         private HeartbeatThread() {
-            super(HEARTBEAT_THREAD_PREFIX + (rebalanceConfig.groupId.isEmpty() ? "" : " | " + rebalanceConfig.groupId), true);
+            super(HEARTBEAT_THREAD_PREFIX + (rebalanceConfig.groupId.isEmpty() ? "" : " | " + rebalanceConfig.groupId));
+            this.setDaemon(true);
         }
 
         public void enable() {

@@ -82,7 +82,7 @@ class KafkaScheduler(val threads: Int,
       executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
       executor.setRemoveOnCancelPolicy(true)
       executor.setThreadFactory(runnable =>
-        new KafkaThread(threadNamePrefix + schedulerThreadId.getAndIncrement(), runnable, daemon))
+        KafkaThread.newKafkaThread(threadNamePrefix + schedulerThreadId.getAndIncrement(), runnable, daemon))
     }
   }
   

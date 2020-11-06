@@ -74,7 +74,7 @@ class DelayedFuturePurgatory(purgatoryName: String, brokerId: Int) {
   private val executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
     new LinkedBlockingQueue[Runnable](),
     new ThreadFactory {
-      override def newThread(r: Runnable): Thread = new KafkaThread(s"DelayedExecutor-$purgatoryName", r, true)
+      override def newThread(r: Runnable): Thread = KafkaThread.newKafkaThread(s"DelayedExecutor-$purgatoryName", r, true)
     })
   val purgatoryKey = new Object
 

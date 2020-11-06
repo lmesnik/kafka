@@ -19,34 +19,36 @@ package org.apache.kafka.common.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
+
 /**
  * A wrapper for Thread that sets things up nicely
  */
-public class KafkaThread extends Thread {
+public class KafkaThread {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    
-    public static KafkaThread daemon(final String name, Runnable runnable) {
-        return new KafkaThread(name, runnable, true);
+    private final static Logger log = LoggerFactory.getLogger(KafkaThread.class);
+
+    public static Thread daemon(final String name, Runnable runnable) {
+        return newKafkaThread(name, runnable, true);
     }
 
-    public static KafkaThread nonDaemon(final String name, Runnable runnable) {
-        return new KafkaThread(name, runnable, false);
+    public static Thread nonDaemon(final String name, Runnable runnable) {
+        return newKafkaThread(name, runnable, false);
     }
 
-    public KafkaThread(final String name, boolean daemon) {
-        super(name);
-        configureThread(name, daemon);
-    }
-
-    public KafkaThread(final String name, Runnable runnable, boolean daemon) {
-        super(runnable, name);
-        configureThread(name, daemon);
-    }
-
-    private void configureThread(final String name, boolean daemon) {
-        setDaemon(daemon);
-        setUncaughtExceptionHandler((t, e) -> log.error("Uncaught exception in thread '{}':", name, e));
+    public static Thread newKafkaThread(final String name, Runnable runnable, boolean daemon) {
+            Thread thread;
+            try {
+                Method newThread = Thread.class.getDeclaredMethod("newThread",
+                        new Class[] { String.class, int.class, Runnable.class });
+                thread = (Thread) newThread.invoke(null, name, 1, runnable);
+            } catch (Exception e) {
+                e.printStackTrace();
+                thread = new Thread(runnable, name);
+            }
+        thread.setDaemon(daemon);
+        thread.setUncaughtExceptionHandler((t, e) -> log.error("Uncaught exception in thread '{}':", name, e));
+        return thread;
     }
 
 }
